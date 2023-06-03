@@ -20,14 +20,26 @@ namespace StarForce
         public ThrusterData(int entityId, int typeId, int ownerId, CampType ownerCamp)
             : base(entityId, typeId, ownerId, ownerCamp)
         {
-            IDataTable<DRThruster> dtThruster = GameEntry.DataTable.GetDataTable<DRThruster>();
-            DRThruster drThruster = dtThruster.GetDataRow(TypeId);
-            if (drThruster == null)
+            // IDataTable<DRThruster> dtThruster = GameEntry.DataTable.GetDataTable<DRThruster>();
+            // DRThruster drThruster = dtThruster.GetDataRow(TypeId);
+            // if (drThruster == null)
+            // {
+            //     return;
+            // }
+            
+            var Thrusters = EntityExtension.jsThrusters.Thrusters;
+            int index = 0;
+            for (int i = 0; i < Thrusters.Count; i++)
             {
-                return;
+                if (Thrusters[i].Id==TypeId)
+                {
+                    index = i;
+                    break;
+                }
             }
+            JsThruster jsThruster = Thrusters[index];
 
-            m_Speed = drThruster.Speed;
+            m_Speed = jsThruster.Speed;
         }
 
         /// <summary>

@@ -5,9 +5,11 @@
 // Feedback: mailto:ellan@gameframework.cn
 //------------------------------------------------------------
 
+using System.IO;
 using GameFramework;
 using GameFramework.DataTable;
 using GameFramework.Sound;
+using LitJson;
 using UnityGameFramework.Runtime;
 
 namespace StarForce
@@ -16,26 +18,60 @@ namespace StarForce
     {
         private const float FadeVolumeDuration = 1f;
         private static int? s_MusicSerialId = null;
+        
+        private static JsSounds JsSounds;
+        private static JsUISounds JsUISounds;
+        private static JsMusics JsMusics;
+        
+        public static void ReadJson()
+        {
+            string Path = AssetUtility.GetJsonAsset("Sound");
+            StreamReader streamReader = new StreamReader(Path);
+            JsonReader js = new JsonReader(streamReader);
+            JsSounds = JsonMapper.ToObject<JsSounds>(js);
+
+            Path = AssetUtility.GetJsonAsset("UISound");
+            streamReader = new StreamReader(Path);
+            js = new JsonReader(streamReader);
+            JsUISounds = JsonMapper.ToObject<JsUISounds>(js);
+
+            Path = AssetUtility.GetJsonAsset("Music");
+            streamReader = new StreamReader(Path);
+            js = new JsonReader(streamReader);
+            JsMusics = JsonMapper.ToObject<JsMusics>(js);
+            
+            js.Close();
+            streamReader.Close();
+        }
 
         public static int? PlayMusic(this SoundComponent soundComponent, int musicId, object userData = null)
         {
             soundComponent.StopMusic();
 
-            IDataTable<DRMusic> dtMusic = GameEntry.DataTable.GetDataTable<DRMusic>();
-            DRMusic drMusic = dtMusic.GetDataRow(musicId);
-            if (drMusic == null)
+            // IDataTable<DRMusic> dtMusic = GameEntry.DataTable.GetDataTable<DRMusic>();
+            // DRMusic drMusic = dtMusic.GetDataRow(musicId);
+            // if (drMusic == null)
+            // {
+            //     Log.Warning("Can not load music '{0}' from data table.", musicId.ToString());
+            //     return null;
+            // }
+            int index=0;
+            for (int i = 0; i < JsMusics.Musics.Count; i++)
             {
-                Log.Warning("Can not load music '{0}' from data table.", musicId.ToString());
-                return null;
+                if (JsMusics.Musics[i].Id==musicId)
+                {
+                    index = i;
+                    break;
+                }
             }
-
+            JsMusic jsMusic = JsMusics.Musics[index];
             PlaySoundParams playSoundParams = PlaySoundParams.Create();
             playSoundParams.Priority = 64;
             playSoundParams.Loop = true;
             playSoundParams.VolumeInSoundGroup = 1f;
             playSoundParams.FadeInSeconds = FadeVolumeDuration;
             playSoundParams.SpatialBlend = 0f;
-            s_MusicSerialId = soundComponent.PlaySound(AssetUtility.GetMusicAsset(drMusic.AssetName), "Music", Constant.AssetPriority.MusicAsset, playSoundParams, null, userData);
+            s_MusicSerialId = soundComponent.PlaySound(AssetUtility.GetMusicAsset(jsMusic.AssetName), "Music", Constant.AssetPriority.MusicAsset, playSoundParams, null, userData);
             return s_MusicSerialId;
         }
 
@@ -52,38 +88,56 @@ namespace StarForce
 
         public static int? PlaySound(this SoundComponent soundComponent, int soundId, Entity bindingEntity = null, object userData = null)
         {
-            IDataTable<DRSound> dtSound = GameEntry.DataTable.GetDataTable<DRSound>();
-            DRSound drSound = dtSound.GetDataRow(soundId);
-            if (drSound == null)
+            // IDataTable<DRSound> dtSound = GameEntry.DataTable.GetDataTable<DRSound>();
+            // DRSound drSound = dtSound.GetDataRow(soundId);
+            // if (drSound == null)
+            // {
+            //     Log.Warning("Can not load sound '{0}' from data table.", soundId.ToString());
+            //     return null;
+            // }
+            int index=0;
+            for (int i = 0; i < JsSounds.Sounds.Count; i++)
             {
-                Log.Warning("Can not load sound '{0}' from data table.", soundId.ToString());
-                return null;
+                if (JsSounds.Sounds[i].Id==soundId)
+                {
+                    index = i;
+                    break;
+                }
             }
-
+            JsSound jsSound = JsSounds.Sounds[index];
             PlaySoundParams playSoundParams = PlaySoundParams.Create();
-            playSoundParams.Priority = drSound.Priority;
-            playSoundParams.Loop = drSound.Loop;
-            playSoundParams.VolumeInSoundGroup = drSound.Volume;
-            playSoundParams.SpatialBlend = drSound.SpatialBlend;
-            return soundComponent.PlaySound(AssetUtility.GetSoundAsset(drSound.AssetName), "Sound", Constant.AssetPriority.SoundAsset, playSoundParams, bindingEntity != null ? bindingEntity.Entity : null, userData);
+            playSoundParams.Priority = jsSound.Priority;
+            playSoundParams.Loop = jsSound.Loop;
+            playSoundParams.VolumeInSoundGroup = jsSound.Volume;
+            playSoundParams.SpatialBlend = jsSound.SpatialBlend;
+            return soundComponent.PlaySound(AssetUtility.GetSoundAsset(jsSound.AssetName), "Sound", Constant.AssetPriority.SoundAsset, playSoundParams, bindingEntity != null ? bindingEntity.Entity : null, userData);
         }
 
         public static int? PlayUISound(this SoundComponent soundComponent, int uiSoundId, object userData = null)
         {
-            IDataTable<DRUISound> dtUISound = GameEntry.DataTable.GetDataTable<DRUISound>();
-            DRUISound drUISound = dtUISound.GetDataRow(uiSoundId);
-            if (drUISound == null)
+            // IDataTable<DRUISound> dtUISound = GameEntry.DataTable.GetDataTable<DRUISound>();
+            // DRUISound drUISound = dtUISound.GetDataRow(uiSoundId);
+            // if (drUISound == null)
+            // {
+            //     Log.Warning("Can not load UI sound '{0}' from data table.", uiSoundId.ToString());
+            //     return null;
+            // }
+            int index=0;
+            for (int i = 0; i < JsUISounds.UISounds.Count; i++)
             {
-                Log.Warning("Can not load UI sound '{0}' from data table.", uiSoundId.ToString());
-                return null;
+                if (JsUISounds.UISounds[i].Id==uiSoundId)
+                {
+                    index = i;
+                    break;
+                }
             }
-
+            JsUISound jsSound = JsUISounds.UISounds[index];
             PlaySoundParams playSoundParams = PlaySoundParams.Create();
-            playSoundParams.Priority = drUISound.Priority;
+            playSoundParams.Priority = jsSound.Priority;
             playSoundParams.Loop = false;
-            playSoundParams.VolumeInSoundGroup = drUISound.Volume;
+            playSoundParams.VolumeInSoundGroup = jsSound.Volume;
             playSoundParams.SpatialBlend = 0f;
-            return soundComponent.PlaySound(AssetUtility.GetUISoundAsset(drUISound.AssetName), "UISound", Constant.AssetPriority.UISoundAsset, playSoundParams, userData);
+            return soundComponent.PlaySound(AssetUtility.GetUISoundAsset(jsSound.AssetName), "UISound", Constant.AssetPriority.UISoundAsset, playSoundParams, userData);
         }
 
         public static bool IsMuted(this SoundComponent soundComponent, string soundGroupName)

@@ -15,6 +15,7 @@ namespace StarForce
     public static class DataTableExtension
     {
         private const string DataRowClassPrefixName = "StarForce.DR";
+        private const string JsonClassPrefixName = "StarForce.Js";
         internal static readonly char[] DataSplitSeparators = new char[] { '\t' };
         internal static readonly char[] DataTrimSeparators = new char[] { '\"' };
 
@@ -33,7 +34,12 @@ namespace StarForce
                 return;
             }
 
+            string jsonClassName = JsonClassPrefixName + splitedNames[0];
+            
             string dataRowClassName = DataRowClassPrefixName + splitedNames[0];
+            
+            Type jsonType = Type.GetType(jsonClassName);
+
             Type dataRowType = Type.GetType(dataRowClassName);
             if (dataRowType == null)
             {
@@ -42,8 +48,11 @@ namespace StarForce
             }
 
             string name = splitedNames.Length > 1 ? splitedNames[1] : null;
+
             DataTableBase dataTable = dataTableComponent.CreateDataTable(dataRowType, name);
+
             dataTable.ReadData(dataTableAssetName, Constant.AssetPriority.DataTableAsset, userData);
+            
         }
 
         public static Color32 ParseColor32(string value)

@@ -5,8 +5,11 @@
 // Feedback: mailto:ellan@gameframework.cn
 //------------------------------------------------------------
 
+using System.IO;
 using GameFramework.DataTable;
 using GameFramework.Event;
+using LitJson;
+using UnityEngine;
 using UnityGameFramework.Runtime;
 using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
@@ -59,16 +62,26 @@ namespace StarForce
 
             int sceneId = procedureOwner.GetData<VarInt32>("NextSceneId");
             m_ChangeToMenu = sceneId == MenuSceneId;
-            IDataTable<DRScene> dtScene = GameEntry.DataTable.GetDataTable<DRScene>();
-            DRScene drScene = dtScene.GetDataRow(sceneId);
-            if (drScene == null)
-            {
-                Log.Warning("Can not load scene '{0}' from data table.", sceneId.ToString());
-                return;
-            }
+            Debug.Log(sceneId);
+            string ScenePath = AssetUtility.GetJsonAsset("Scene");
+            StreamReader streamReader = new StreamReader(ScenePath);
+            JsonReader js = new JsonReader(streamReader);
+            JsScenes jsScenes = JsonMapper.ToObject<JsScenes>(js);
+            JsScene jsScene = jsScenes.Scenes[sceneId-1];
+            
+            js.Close();
+            streamReader.Close();
 
-            GameEntry.Scene.LoadScene(AssetUtility.GetSceneAsset(drScene.AssetName), Constant.AssetPriority.SceneAsset, this);
-            m_BackgroundMusicId = drScene.BackgroundMusicId;
+            // IDataTable<DRScene> dtScene = GameEntry.DataTable.GetDataTable<DRScene>();
+            // DRScene drScene = dtScene.GetDataRow(sceneId);
+            // if (drScene == null)
+            // {
+            //     Log.Warning("Can not load scene '{0}' from data table.", sceneId.ToString());
+            //     return;
+            // }
+
+            GameEntry.Scene.LoadScene(AssetUtility.GetSceneAsset(/*drScene.AssetName*/jsScene.AssetName), Constant.AssetPriority.SceneAsset, this);
+            m_BackgroundMusicId = jsScene.BackgroundMusicId;
         }
 
         protected override void OnLeave(ProcedureOwner procedureOwner, bool isShutdown)

@@ -5,7 +5,7 @@
 // Feedback: mailto:ellan@gameframework.cn
 //------------------------------------------------------------
 // 此文件由工具自动生成，请勿直接修改。
-// 生成时间：2021-06-16 21:54:35.610
+// 生成时间：2023-05-30 22:09:12.355
 //------------------------------------------------------------
 
 using GameFramework;
@@ -13,7 +13,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using LitJson;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityGameFramework.Runtime;
 
 namespace StarForce
@@ -56,18 +58,26 @@ namespace StarForce
 
         public override bool ParseDataRow(string dataRowString, object userData)
         {
+            
+            
             string[] columnStrings = dataRowString.Split(DataTableExtension.DataSplitSeparators);
             for (int i = 0; i < columnStrings.Length; i++)
             {
                 columnStrings[i] = columnStrings[i].Trim(DataTableExtension.DataTrimSeparators);
             }
-
             int index = 0;
             index++;
             m_Id = int.Parse(columnStrings[index++]);
             index++;
             AssetName = columnStrings[index++];
             BackgroundMusicId = int.Parse(columnStrings[index++]);
+
+            // string ScenePath = AssetUtility.GetJsonAsset("Scene");
+            // StreamReader streamReader = new StreamReader(ScenePath);
+            // JsonReader js = new JsonReader(streamReader);
+            // JsScenes jsScenes = JsonMapper.ToObject<JsScenes>(js);
+            // JsScene jsScene = jsScenes.Scenes[0];
+            
 
             GeneratePropertyArray();
             return true;

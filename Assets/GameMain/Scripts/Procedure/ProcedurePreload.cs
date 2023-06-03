@@ -48,8 +48,8 @@ namespace StarForce
 
             GameEntry.Event.Subscribe(LoadConfigSuccessEventArgs.EventId, OnLoadConfigSuccess);
             GameEntry.Event.Subscribe(LoadConfigFailureEventArgs.EventId, OnLoadConfigFailure);
-            GameEntry.Event.Subscribe(LoadDataTableSuccessEventArgs.EventId, OnLoadDataTableSuccess);
-            GameEntry.Event.Subscribe(LoadDataTableFailureEventArgs.EventId, OnLoadDataTableFailure);
+            // GameEntry.Event.Subscribe(LoadDataTableSuccessEventArgs.EventId, OnLoadDataTableSuccess);
+            // GameEntry.Event.Subscribe(LoadDataTableFailureEventArgs.EventId, OnLoadDataTableFailure);
             GameEntry.Event.Subscribe(LoadDictionarySuccessEventArgs.EventId, OnLoadDictionarySuccess);
             GameEntry.Event.Subscribe(LoadDictionaryFailureEventArgs.EventId, OnLoadDictionaryFailure);
 
@@ -62,8 +62,8 @@ namespace StarForce
         {
             GameEntry.Event.Unsubscribe(LoadConfigSuccessEventArgs.EventId, OnLoadConfigSuccess);
             GameEntry.Event.Unsubscribe(LoadConfigFailureEventArgs.EventId, OnLoadConfigFailure);
-            GameEntry.Event.Unsubscribe(LoadDataTableSuccessEventArgs.EventId, OnLoadDataTableSuccess);
-            GameEntry.Event.Unsubscribe(LoadDataTableFailureEventArgs.EventId, OnLoadDataTableFailure);
+            // GameEntry.Event.Unsubscribe(LoadDataTableSuccessEventArgs.EventId, OnLoadDataTableSuccess);
+            // GameEntry.Event.Unsubscribe(LoadDataTableFailureEventArgs.EventId, OnLoadDataTableFailure);
             GameEntry.Event.Unsubscribe(LoadDictionarySuccessEventArgs.EventId, OnLoadDictionarySuccess);
             GameEntry.Event.Unsubscribe(LoadDictionaryFailureEventArgs.EventId, OnLoadDictionaryFailure);
 
@@ -92,16 +92,22 @@ namespace StarForce
             LoadConfig("DefaultConfig");
 
             // Preload data tables
-            foreach (string dataTableName in DataTableNames)
-            {
-                LoadDataTable(dataTableName);
-            }
+            // foreach (string dataTableName in DataTableNames)
+            // {
+            //     LoadDataTable(dataTableName);
+            // }
 
             // Preload dictionaries
             LoadDictionary("Default");
 
             // Preload fonts
             LoadFont("MainFont");
+            
+            UIExtension.ReadJson();
+            
+            SoundExtension.ReadJson();
+            
+            EntityExtension.ReadJson();
         }
 
         private void LoadConfig(string configName)
@@ -113,6 +119,7 @@ namespace StarForce
 
         private void LoadDataTable(string dataTableName)
         {
+            string jsonAssetName = AssetUtility.GetJsonAsset(dataTableName);
             string dataTableAssetName = AssetUtility.GetDataTableAsset(dataTableName, false);
             m_LoadedFlag.Add(dataTableAssetName, false);
             GameEntry.DataTable.LoadDataTable(dataTableName, dataTableAssetName, this);

@@ -7,6 +7,9 @@
 
 using GameFramework.DataTable;
 using System;
+using System.IO;
+using LitJson;
+using UnityEngine;
 using UnityGameFramework.Runtime;
 
 namespace StarForce
@@ -18,6 +21,50 @@ namespace StarForce
         // 正值用于和服务器通信的实体（如玩家角色、NPC、怪等，服务器只产生正值）
         // 负值用于本地生成的临时实体（如特效、FakeObject等）
         private static int s_SerialId = 0;
+
+        private static JsEntities jsEntities;
+        public static JsAsteroids jsAsteroids;
+        public static JsArmors jsArmors;
+        public static JsAircrafts jsAircrafts;
+        public static JsThrusters jsThrusters;
+        public static JsWeapons jsWeapons;
+        
+        public static void ReadJson()
+        {
+            string Path = AssetUtility.GetJsonAsset("Entity");
+            StreamReader streamReader = new StreamReader(Path);
+            JsonReader js = new JsonReader(streamReader);
+            jsEntities = JsonMapper.ToObject<JsEntities>(js);
+            
+            Path = AssetUtility.GetJsonAsset("Asteroid");
+            streamReader = new StreamReader(Path);
+            js = new JsonReader(streamReader);
+            jsAsteroids = JsonMapper.ToObject<JsAsteroids>(js);
+            
+            Path = AssetUtility.GetJsonAsset("Armor");
+            streamReader = new StreamReader(Path);
+            js = new JsonReader(streamReader);
+            jsArmors = JsonMapper.ToObject<JsArmors>(js);
+            
+            Path = AssetUtility.GetJsonAsset("Aircraft");
+            streamReader = new StreamReader(Path);
+            js = new JsonReader(streamReader);
+            jsAircrafts = JsonMapper.ToObject<JsAircrafts>(js);
+            
+            
+            Path = AssetUtility.GetJsonAsset("Thruster");
+            streamReader = new StreamReader(Path);
+            js = new JsonReader(streamReader);
+            jsThrusters = JsonMapper.ToObject<JsThrusters>(js);
+            
+            Path = AssetUtility.GetJsonAsset("Weapon");
+            streamReader = new StreamReader(Path);
+            js = new JsonReader(streamReader);
+            jsWeapons = JsonMapper.ToObject<JsWeapons>(js);
+            
+            js.Close();
+            streamReader.Close();
+        }
 
         public static Entity GetGameEntity(this EntityComponent entityComponent, int entityId)
         {
@@ -88,15 +135,26 @@ namespace StarForce
                 return;
             }
 
-            IDataTable<DREntity> dtEntity = GameEntry.DataTable.GetDataTable<DREntity>();
-            DREntity drEntity = dtEntity.GetDataRow(data.TypeId);
-            if (drEntity == null)
+            // IDataTable<DREntity> dtEntity = GameEntry.DataTable.GetDataTable<DREntity>();
+            // DREntity drEntity = dtEntity.GetDataRow(data.TypeId);
+            // if (drEntity == null)
+            // {
+            //     Log.Warning("Can not load entity id '{0}' from data table.", data.TypeId.ToString());
+            //     return;
+            // }
+            
+            int index=0;
+            for (int i = 0; i < jsEntities.Entities.Count; i++)
             {
-                Log.Warning("Can not load entity id '{0}' from data table.", data.TypeId.ToString());
-                return;
+                if (jsEntities.Entities[i].Id==data.TypeId)
+                {
+                    index = i;
+                    break;
+                }
             }
-
-            entityComponent.ShowEntity(data.Id, logicType, AssetUtility.GetEntityAsset(drEntity.AssetName), entityGroup, priority, data);
+            JsEntity jsEntitie = jsEntities.Entities[index];
+            
+            entityComponent.ShowEntity(data.Id, logicType, AssetUtility.GetEntityAsset(jsEntitie.AssetName), entityGroup, priority, data);
         }
 
         public static int GenerateSerialId(this EntityComponent entityComponent)
