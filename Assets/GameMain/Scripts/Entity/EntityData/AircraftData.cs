@@ -39,40 +39,27 @@ namespace StarForce
         public AircraftData(int entityId, int typeId, CampType camp)
             : base(entityId, typeId, camp)
         {
-            var Aircrafts = EntityExtension.jsAircrafts.Aircrafts;
-            int Index = 0;
-            for (int i = 0; i < Aircrafts.Count; i++)
+            IDataTable<DRAircraft> dtAircraft = GameEntry.DataTable.GetDataTable<DRAircraft>();
+            DRAircraft drAircraft = dtAircraft.GetDataRow(TypeId);
+            if (drAircraft == null)
             {
-                if (Aircrafts[i].Id==TypeId)
-                {
-                    Index = i;
-                    break;
-                }
+                return;
             }
-            JsAircraft jsAircraft = Aircrafts[Index];
-            
-            // IDataTable<DRAircraft> dtAircraft = GameEntry.DataTable.GetDataTable<DRAircraft>();
-            // DRAircraft drAircraft = dtAircraft.GetDataRow(TypeId);
-            // if (drAircraft == null)
-            // {
-            //     return;
-            // }
-            jsAircraft.GeneratePropertyArray();
-            
-            m_ThrusterData = new ThrusterData(GameEntry.Entity.GenerateSerialId(), jsAircraft.ThrusterId, Id, Camp);
 
-            for (int index = 0, weaponId = 0; (weaponId = jsAircraft.GetWeaponIdAt(index)) > 0; index++)
+            m_ThrusterData = new ThrusterData(GameEntry.Entity.GenerateSerialId(), drAircraft.ThrusterId, Id, Camp);
+
+            for (int index = 0, weaponId = 0; (weaponId = drAircraft.GetWeaponIdAt(index)) > 0; index++)
             {
                 AttachWeaponData(new WeaponData(GameEntry.Entity.GenerateSerialId(), weaponId, Id, Camp));
             }
 
-            for (int index = 0, armorId = 0; (armorId = jsAircraft.GetArmorIdAt(index)) > 0; index++)
+            for (int index = 0, armorId = 0; (armorId = drAircraft.GetArmorIdAt(index)) > 0; index++)
             {
                 AttachArmorData(new ArmorData(GameEntry.Entity.GenerateSerialId(), armorId, Id, Camp));
             }
 
-            m_DeadEffectId = jsAircraft.DeadEffectId;
-            m_DeadSoundId = jsAircraft.DeadSoundId;
+            m_DeadEffectId = drAircraft.DeadEffectId;
+            m_DeadSoundId = drAircraft.DeadSoundId;
 
             HP = m_MaxHP;
         }

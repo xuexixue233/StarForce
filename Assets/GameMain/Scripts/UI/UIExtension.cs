@@ -8,9 +8,6 @@
 using GameFramework.DataTable;
 using GameFramework.UI;
 using System.Collections;
-using System.IO;
-using System.Runtime.CompilerServices;
-using LitJson;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityGameFramework.Runtime;
@@ -19,17 +16,6 @@ namespace StarForce
 {
     public static class UIExtension
     {
-        private static JsUIForms jsUIForms;
-        public static void ReadJson()
-        {
-            string Path = AssetUtility.GetJsonAsset("UIForm");
-            StreamReader streamReader = new StreamReader(Path);
-            JsonReader js = new JsonReader(streamReader);
-            jsUIForms = JsonMapper.ToObject<JsUIForms>(js);
-            js.Close();
-            streamReader.Close();
-        }
-        
         public static IEnumerator FadeToAlpha(this CanvasGroup canvasGroup, float alpha, float duration)
         {
             float time = 0f;
@@ -65,25 +51,14 @@ namespace StarForce
 
         public static bool HasUIForm(this UIComponent uiComponent, int uiFormId, string uiGroupName = null)
         {
-            // IDataTable<DRUIForm> dtUIForm = GameEntry.DataTable.GetDataTable<DRUIForm>();
-            // DRUIForm drUIForm = dtUIForm.GetDataRow(uiFormId);
-            
-            // if (drUIForm == null)
-            // {
-            //     return false;
-            // }
-            
-            int index=0;
-            for (int i = 0; i < jsUIForms.UIForms.Count; i++)
+            IDataTable<DRUIForm> dtUIForm = GameEntry.DataTable.GetDataTable<DRUIForm>();
+            DRUIForm drUIForm = dtUIForm.GetDataRow(uiFormId);
+            if (drUIForm == null)
             {
-                if (jsUIForms.UIForms[i].Id==uiFormId)
-                {
-                    index = i;
-                    break;
-                }
+                return false;
             }
-            JsUIForm jsUIForm = jsUIForms.UIForms[index];
-            string assetName = AssetUtility.GetUIFormAsset(jsUIForm.AssetName);
+
+            string assetName = AssetUtility.GetUIFormAsset(drUIForm.AssetName);
             if (string.IsNullOrEmpty(uiGroupName))
             {
                 return uiComponent.HasUIForm(assetName);
@@ -105,25 +80,14 @@ namespace StarForce
 
         public static UGuiForm GetUIForm(this UIComponent uiComponent, int uiFormId, string uiGroupName = null)
         {
-            // IDataTable<DRUIForm> dtUIForm = GameEntry.DataTable.GetDataTable<DRUIForm>();
-            // DRUIForm drUIForm = dtUIForm.GetDataRow(uiFormId);
-            
-            // if (drUIForm == null)
-            // {
-            //     return null;
-            // }
-            
-            int index=0;
-            for (int i = 0; i < jsUIForms.UIForms.Count; i++)
+            IDataTable<DRUIForm> dtUIForm = GameEntry.DataTable.GetDataTable<DRUIForm>();
+            DRUIForm drUIForm = dtUIForm.GetDataRow(uiFormId);
+            if (drUIForm == null)
             {
-                if (jsUIForms.UIForms[i].Id==uiFormId)
-                {
-                    index = i;
-                    break;
-                }
+                return null;
             }
-            JsUIForm jsUIForm = jsUIForms.UIForms[index];
-            string assetName = AssetUtility.GetUIFormAsset(jsUIForm.AssetName);
+
+            string assetName = AssetUtility.GetUIFormAsset(drUIForm.AssetName);
             UIForm uiForm = null;
             if (string.IsNullOrEmpty(uiGroupName))
             {
@@ -163,26 +127,16 @@ namespace StarForce
 
         public static int? OpenUIForm(this UIComponent uiComponent, int uiFormId, object userData = null)
         {
-            // IDataTable<DRUIForm> dtUIForm = GameEntry.DataTable.GetDataTable<DRUIForm>();
-            // DRUIForm drUIForm = dtUIForm.GetDataRow(uiFormId);
-            // if (drUIForm == null)
-            // {
-            //     Log.Warning("Can not load UI form '{0}' from data table.", uiFormId.ToString());
-            //     return null;
-            // }
-            
-            int index=0;
-            for (int i = 0; i < jsUIForms.UIForms.Count; i++)
+            IDataTable<DRUIForm> dtUIForm = GameEntry.DataTable.GetDataTable<DRUIForm>();
+            DRUIForm drUIForm = dtUIForm.GetDataRow(uiFormId);
+            if (drUIForm == null)
             {
-                if (jsUIForms.UIForms[i].Id==uiFormId)
-                {
-                    index = i;
-                    break;
-                }
+                Log.Warning("Can not load UI form '{0}' from data table.", uiFormId.ToString());
+                return null;
             }
-            JsUIForm jsUIForm = jsUIForms.UIForms[index];
-            string assetName = AssetUtility.GetUIFormAsset(jsUIForm.AssetName);
-            if (!jsUIForm.AllowMultiInstance)
+
+            string assetName = AssetUtility.GetUIFormAsset(drUIForm.AssetName);
+            if (!drUIForm.AllowMultiInstance)
             {
                 if (uiComponent.IsLoadingUIForm(assetName))
                 {
@@ -195,7 +149,7 @@ namespace StarForce
                 }
             }
 
-            return uiComponent.OpenUIForm(assetName, jsUIForm.UIGroupName, Constant.AssetPriority.UIFormAsset, jsUIForm.PauseCoveredUIForm, userData);
+            return uiComponent.OpenUIForm(assetName, drUIForm.UIGroupName, Constant.AssetPriority.UIFormAsset, drUIForm.PauseCoveredUIForm, userData);
         }
 
         public static void OpenDialog(this UIComponent uiComponent, DialogParams dialogParams)

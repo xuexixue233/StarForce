@@ -32,30 +32,18 @@ namespace StarForce
         public WeaponData(int entityId, int typeId, int ownerId, CampType ownerCamp)
             : base(entityId, typeId, ownerId, ownerCamp)
         {
-            // IDataTable<DRWeapon> dtWeapon = GameEntry.DataTable.GetDataTable<DRWeapon>();
-            // DRWeapon drWeapon = dtWeapon.GetDataRow(TypeId);
-            // if (drWeapon == null)
-            // {
-            //     return;
-            // }
-            
-            var Weapons = EntityExtension.jsWeapons.Weapons;
-            int index = 0;
-            for (int i = 0; i < Weapons.Count; i++)
+            IDataTable<DRWeapon> dtWeapon = GameEntry.DataTable.GetDataTable<DRWeapon>();
+            DRWeapon drWeapon = dtWeapon.GetDataRow(TypeId);
+            if (drWeapon == null)
             {
-                if (Weapons[i].Id==TypeId)
-                {
-                    index = i;
-                    break;
-                }
+                return;
             }
-            JsWeapon jsWeapon = Weapons[index];
 
-            m_Attack = jsWeapon.Attack;
-            m_AttackInterval = (float)jsWeapon.AttackInterval;
-            m_BulletId = jsWeapon.BulletId;
-            m_BulletSpeed = jsWeapon.BulletSpeed;
-            m_BulletSoundId = jsWeapon.BulletSoundId;
+            m_Attack = drWeapon.Attack;
+            m_AttackInterval = drWeapon.AttackInterval;
+            m_BulletId = drWeapon.BulletId;
+            m_BulletSpeed = drWeapon.BulletSpeed;
+            m_BulletSoundId = drWeapon.BulletSoundId;
         }
 
         /// <summary>

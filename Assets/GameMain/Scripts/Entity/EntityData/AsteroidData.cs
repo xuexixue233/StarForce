@@ -35,32 +35,19 @@ namespace StarForce
         public AsteroidData(int entityId, int typeId)
             : base(entityId, typeId, CampType.Neutral)
         {
-            var Asteroids = EntityExtension.jsAsteroids.Asteroids;
-            int index = 0;
-            for (int i = 0; i < Asteroids.Count; i++)
+            IDataTable<DRAsteroid> dtAsteroid = GameEntry.DataTable.GetDataTable<DRAsteroid>();
+            DRAsteroid drAsteroid = dtAsteroid.GetDataRow(TypeId);
+            if (drAsteroid == null)
             {
-                if (Asteroids[i].Id==TypeId)
-                {
-                    index = i;
-                    break;
-                }
+                return;
             }
-            JsAsteroid jsAsteroid = Asteroids[index];
-            
-            // IDataTable<DRAsteroid> dtAsteroid = GameEntry.DataTable.GetDataTable<DRAsteroid>();
-            // DRAsteroid drAsteroid = dtAsteroid.GetDataRow(TypeId);
 
-            // if (drAsteroid == null)
-            // {
-            //     return;
-            // }
-
-            HP = m_MaxHP = jsAsteroid.MaxHP;
-            m_Attack = jsAsteroid.Attack;
-            m_Speed = jsAsteroid.Speed;
-            m_AngularSpeed = jsAsteroid.AngularSpeed;
-            m_DeadEffectId = jsAsteroid.DeadEffectId;
-            m_DeadSoundId = jsAsteroid.DeadSoundId;
+            HP = m_MaxHP = drAsteroid.MaxHP;
+            m_Attack = drAsteroid.Attack;
+            m_Speed = drAsteroid.Speed;
+            m_AngularSpeed = drAsteroid.AngularSpeed;
+            m_DeadEffectId = drAsteroid.DeadEffectId;
+            m_DeadSoundId = drAsteroid.DeadSoundId;
         }
 
         public override int MaxHP

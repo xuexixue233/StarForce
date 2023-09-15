@@ -5,7 +5,7 @@
 // Feedback: mailto:ellan@gameframework.cn
 //------------------------------------------------------------
 // 此文件由工具自动生成，请勿直接修改。
-// 生成时间：2023-05-30 22:09:12.373
+// 生成时间：2021-06-16 21:54:35.652
 //------------------------------------------------------------
 
 using GameFramework;
@@ -23,7 +23,6 @@ namespace StarForce
     /// </summary>
     public class DRUIForm : DataRowBase
     {
-        
         private int m_Id = 0;
 
         /// <summary>
